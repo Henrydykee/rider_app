@@ -17,14 +17,83 @@ class _HomeScreenState extends State<HomeScreen> {
     zoom: 14.4746,
   );
 
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //     title: Text("Home",style: TextStyle(color: Colors.black),),
-      //   backgroundColor: Colors.,
-      //   elevation: 0.0,
-      // ),
+      key: _scaffoldKey,
+      appBar: AppBar(
+          title: Text("Home",style: TextStyle(color: Colors.black),),
+        backgroundColor: Colors.transparent,
+        leading: GestureDetector(
+          onTap: (){
+            _scaffoldKey.currentState.openDrawer();
+          },
+            child: Icon(Icons.menu,color: Colors.black,)),
+        elevation: 0.0,
+      ),
+      drawer: Drawer(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(top: 80),
+              child: Container(
+                height: 100,
+                width: 100,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.green),
+                    image: DecorationImage(image: AssetImage("assets/images/avatar.jpg"))
+                ),
+              ),
+            ),
+            SizedBox(
+              height: 5,
+            ),
+            ////////////
+            SizedBox(height: 30,),
+            Divider(color: Colors.grey.withOpacity(0.4),),
+            Padding(
+              padding: const EdgeInsets.only(top: 20,left: 40),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.history),
+                      SizedBox(width: 15,),
+                      Text("History",style: TextStyle(
+                        fontSize: 13,color: Colors.black
+                      ),)
+                    ],
+                  ),
+                  SizedBox(height: 15,),
+                  Row(
+                    children: [
+                      Icon(Icons.person),
+                      SizedBox(width: 15,),
+                      Text("Vist Profile",style: TextStyle(
+                          fontSize: 13,color: Colors.black
+                      ),)
+                    ],
+                  ),
+                  SizedBox(height: 15,),
+                  Row(
+                    children: [
+                      Icon(Icons.info),
+                      SizedBox(width: 15,),
+                      Text("About",style: TextStyle(
+                          fontSize: 13,color: Colors.black
+                      ),)
+                    ],
+                  ),
+
+                ],
+              ),
+            )
+          ],
+        ),
+      ),
       body: Stack(
         children: [
           GoogleMap(
