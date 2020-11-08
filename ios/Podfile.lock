@@ -41,6 +41,8 @@ PODS:
   - fluttertoast (0.0.2):
     - Flutter
     - Toast
+  - "geolocator (6.0.0+4)":
+    - Flutter
   - google_maps_flutter (0.0.1):
     - Flutter
     - GoogleMaps (< 3.10)
@@ -82,6 +84,7 @@ DEPENDENCIES:
   - firebase_database (from `.symlinks/plugins/firebase_database/ios`)
   - Flutter (from `Flutter`)
   - fluttertoast (from `.symlinks/plugins/fluttertoast/ios`)
+  - geolocator (from `.symlinks/plugins/geolocator/ios`)
   - google_maps_flutter (from `.symlinks/plugins/google_maps_flutter/ios`)
 
 SPEC REPOS:
@@ -111,6 +114,8 @@ EXTERNAL SOURCES:
     :path: Flutter
   fluttertoast:
     :path: ".symlinks/plugins/fluttertoast/ios"
+  geolocator:
+    :path: ".symlinks/plugins/geolocator/ios"
   google_maps_flutter:
     :path: ".symlinks/plugins/google_maps_flutter/ios"
 
@@ -125,6 +130,7 @@ SPEC CHECKSUMS:
   FirebaseDatabase: 13a865a4b85897462b930eb683bda8f52583713f
   Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
   fluttertoast: 6122fa75143e992b1d3470f61000f591a798cc58
+  geolocator: 1ae40084cc6c1586ce5ad12cfc3fd38c64d05f2f
   google_maps_flutter: c7f9c73576de1fbe152a227bfd6e6c4ae8088619
   GoogleDataTransport: b7f406340a291370045a270c599e53c6fa6ec20f
   GoogleMaps: 4b5346bddfe6911bb89155d43c903020170523ac

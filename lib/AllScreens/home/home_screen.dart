@@ -1,7 +1,14 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:rider_app/AllScreens/search_screen.dart';
+import 'package:rider_app/Assitants/assitantMethods.dart';
+import 'package:rider_app/Assitants/request_assitance.dart';
+import 'package:rider_app/DataHandler/appData.dart';
+import 'package:rider_app/widget/progress_dialog.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -17,13 +24,34 @@ class _HomeScreenState extends State<HomeScreen> {
     zoom: 14.4746,
   );
 
+  Position currentPosition;
+  var geoLocator= Geolocator();
+
+  var buttomPaddingOfMap = 0.0;
+
+  void locatePosition() async{
+    Position position = await  Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    currentPosition = position;
+    LatLng latlangPosition = LatLng(position.latitude, position.longitude);
+    CameraPosition cameraPosition = new CameraPosition(target: latlangPosition,zoom: 14);
+    newGoogleMapController .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
+
+    String address  = await AssistantMethods().searchCordinateAddress(position, context);
+    print("this is your address" + address);
+  }
+
+
+
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+
+  AppData appData = AppData();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
+        centerTitle: true,
           title: Text("Home",style: TextStyle(color: Colors.black),),
         backgroundColor: Colors.transparent,
         leading: GestureDetector(
@@ -97,12 +125,19 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Stack(
         children: [
           GoogleMap(
+            padding:  EdgeInsets.only(bottom: buttomPaddingOfMap ),
             mapType: MapType.normal,
               myLocationButtonEnabled: true,
+              zoomControlsEnabled: true,
+              zoomGesturesEnabled: true,
               initialCameraPosition: _kGooglePlex,
             onMapCreated: (GoogleMapController controller){
+              setState(() {
+                buttomPaddingOfMap = 300.0;
+              });
               _controllerGoogleMap.complete(controller);
               newGoogleMapController = controller;
+              locatePosition();
             },
           ),
           Positioned(
@@ -110,7 +145,7 @@ class _HomeScreenState extends State<HomeScreen> {
               right: 0.0,
               bottom: 0.0,
               child: Container(
-                height: 320.0,
+                height: 300.0,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(15.0),
@@ -135,29 +170,37 @@ class _HomeScreenState extends State<HomeScreen> {
                           fontSize: 20.0
                       ),),
                       SizedBox(height: 20.0,),
-                      Container(
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(5.0),
-                            boxShadow: [
-                              BoxShadow(
-                                  color: Colors.black54,
-                                  blurRadius: 2.0,
-                                  spreadRadius: 0.2,
-                                  offset: Offset(0.7,0.7)
-                              )
-                            ]
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: Row(
-                            children: [
-                              Icon(Icons.search,color: Colors.black,),
-                              SizedBox(height: 10.0,),
-                              Text("Search Drop off",style: TextStyle(
-                                  fontSize: 15.0
-                              ),),
-                            ],
+                      GestureDetector(
+                        onTap: (){
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => SearchScreen()),
+                          );
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(5.0),
+                              boxShadow: [
+                                BoxShadow(
+                                    color: Colors.black54,
+                                    blurRadius: 2.0,
+                                    spreadRadius: 0.2,
+                                    offset: Offset(0.7,0.7)
+                                )
+                              ]
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(10.0),
+                            child: Row(
+                              children: [
+                                Icon(Icons.search,color: Colors.black,),
+                                SizedBox(height: 10.0,),
+                                Text("Search Drop off",style: TextStyle(
+                                    fontSize: 15.0
+                                ),),
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -170,8 +213,15 @@ class _HomeScreenState extends State<HomeScreen> {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text("Add Home",style: TextStyle(
+                              Text("${
+                                  Provider.of<AppData>(context).pickUpLocation != null ? Provider.of<AppData>(context).pickUpLocation.placeFormattedAddress
+                                      : ""
+                              }",style: TextStyle(
                                   fontSize: 15.0
+                              ),),
+                              SizedBox(height: 3.0,),
+                              Text("Your current location",style: TextStyle(
+                                  fontSize: 10.0
                               ),),
                             ],
                           )

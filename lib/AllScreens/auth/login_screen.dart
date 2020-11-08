@@ -5,8 +5,10 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
 import 'package:rider_app/AllScreens/auth/signup_screen.dart';
 import 'package:rider_app/AllScreens/home/home_screen.dart';
+import 'package:rider_app/DataHandler/appData.dart';
 import 'package:rider_app/widget/button.dart';
 import 'package:rider_app/widget/progress_dialog.dart';
 
@@ -145,7 +147,9 @@ class _LoginScreenState extends State<LoginScreen> {
       usersRef.child(firebaseUser.uid).once().then((DataSnapshot snap){
         if(snap != null){
           Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) =>
-              HomeScreen()), (Route<dynamic> route) => false);
+              ChangeNotifierProvider.value(
+                value:  AppData(),
+                  child: HomeScreen())), (Route<dynamic> route) => false);
         } else{
           _firebaseAuth.signOut();
           Navigator.of(context).pop();
