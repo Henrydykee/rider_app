@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:rider_app/Assitants/request_assitance.dart';
+import 'package:rider_app/Models/place_prediction.dart';
 import 'package:rider_app/config_map.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -8,19 +11,26 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
+  List<PlacePrediction> placePredictionList = [];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Set Drop off",style: TextStyle(color: Colors.black),),
+        title: Text(
+          "Set Drop off",
+          style: TextStyle(color: Colors.black),
+        ),
         centerTitle: true,
         elevation: 0.0,
         backgroundColor: Colors.white,
         leading: GestureDetector(
-          onTap: (){
-            Navigator.of(context).pop();
-          },
-            child: Icon(Icons.arrow_back,color: Colors.black,)),
+            onTap: () {
+              Navigator.of(context).pop();
+            },
+            child: Icon(
+              Icons.arrow_back,
+              color: Colors.black,
+            )),
       ),
       body: Column(
         children: [
@@ -34,7 +44,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   offset: Offset(0.7, 0.7))
             ]),
             child: Padding(
-              padding: const EdgeInsets.only(left: 25.0,right: 25.0,top: 20),
+              padding: const EdgeInsets.only(left: 25.0, right: 25.0, top: 20),
               child: Column(
                 children: [
                   SizedBox(height: 5.0),
@@ -100,8 +110,10 @@ class _SearchScreenState extends State<SearchScreen> {
                         child: Padding(
                           padding: const EdgeInsets.all(13.0),
                           child: TextField(
-                            onChanged:  (value){
-                              findPlace(value);
+                            onChanged: (value) {
+                              setState(() {
+                                findPlace(value);
+                              });
                             },
                             decoration: InputDecoration(
                                 hintText: "Destination Location",
@@ -119,27 +131,96 @@ class _SearchScreenState extends State<SearchScreen> {
                 ],
               ),
             ),
-          )
+          ),
+          // dispaly predictio
+            (placePredictionList.length > 0 ) ? Padding(
+                padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+              child: ListView.separated(
+                physics: ClampingScrollPhysics(),
+                shrinkWrap: true,
+                padding: EdgeInsets.all(0.0),
+                  itemBuilder: (context, index){
+                  return PredictionTile(
+                    placePrediction: placePredictionList[index],
+                  );
+                  },
+                  separatorBuilder: (BuildContext context, int index) => Divider(),
+                  itemCount: placePredictionList.length),
+            ) : Container()
         ],
       ),
     );
   }
 
-
   void findPlace(String placeName) async {
-
-    if(placeName.length > 1){
-
-      String autoComplete = "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$placeName&key=$mapKey&sessiontoken=1234567890&components=country:NG";
+    if (placeName.length > 1) {
+      String autoComplete =
+          "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$placeName&key=$mapKey&sessiontoken=1234567890&components=country:NG";
 
       var res = await RequestAssitant.getRequest(autoComplete);
 
-      if (res == "failed"){
+      if (res == "failed") {
         return;
       }
 
-      print(res);
-
+      if (res["status"] == "OK") {
+        var predictions = res["predictions"];
+        var placeList = (predictions as List)
+            .map((e) => PlacePrediction.fromJson(e))
+            .toList();
+        setState(() {
+          placePredictionList = placeList;
+        });
+      }
     }
+  }
+}
+
+class PredictionTile extends StatelessWidget {
+  final PlacePrediction placePrediction;
+
+  PredictionTile({Key key, this.placePrediction}) : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Column(
+        children: [
+          SizedBox(
+            width: 10.0,
+          ),
+          Row(
+            children: [
+              Icon(Icons.add_location),
+              SizedBox(
+                width: 14.0,
+              ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      placePrediction.main_text,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontSize: 16.0),
+                    ),
+                    SizedBox(
+                      height: 3.0,
+                    ),
+                    Text(
+                      placePrediction.secondary_text,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontSize: 12.0, color: Colors.grey),
+                    )
+                  ],
+                ),
+              )
+            ],
+          ),
+          SizedBox(
+            width: 10.0,
+          ),
+        ],
+      ),
+    );
   }
 }
