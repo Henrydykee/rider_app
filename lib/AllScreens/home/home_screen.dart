@@ -171,11 +171,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),),
                       SizedBox(height: 20.0,),
                       GestureDetector(
-                        onTap: (){
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => SearchScreen()),
-                          );
+                        onTap: () async {
+                         var res =  Navigator.push(context, MaterialPageRoute(builder: (context) => SearchScreen()),);
+                         if( res == "obtainDirection"){
+                           await getPlaceDirection();
+                         }
                         },
                         child: Container(
                           decoration: BoxDecoration(
@@ -235,5 +235,23 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
     );
+  }
+
+
+
+  Future<void> getPlaceDirection() async{
+    var initialPos =  Provider.of<AppData>(context, listen: false).pickUpLocation;
+    var finalPos =  Provider.of<AppData>(context, listen: false).dropOffLocation;
+
+    var pickUpLatLng = LatLng(initialPos.latitude, initialPos.longitude);
+    var dropOffLatLng = LatLng(finalPos.latitude, finalPos.longitude);
+
+    showDialog(
+        context: context,
+      builder: (BuildContext  context) => ProgressDialog(message: "please wait....")
+    );
+
+    var details = await AssistantMethods.obtainPlaceDirection(pickUpLatLng, dropOffLatLng);
+    Navigator.of(context).pop();
   }
 }

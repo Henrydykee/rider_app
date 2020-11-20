@@ -188,8 +188,7 @@ class _SearchScreenState extends State<SearchScreen> {
   
   showDialog(context: context, builder: (BuildContext context) => ProgressDialog(message: "Setting drop off"));
   
-  String placeAddressUrl =
-      "https://maps.googleapis.com/maps/api/place/details/json?place_id=$PlaceId&key=$mapKey";
+  String placeAddressUrl = "https://maps.googleapis.com/maps/api/place/details/json?place_id=$PlaceId&key=$mapKey";
 
   var res = await RequestAssitant.getRequest(placeAddressUrl);
 
@@ -205,6 +204,8 @@ class _SearchScreenState extends State<SearchScreen> {
     address.latitude = res["result"]["geometry"]["location"]["lat"];
     address.longitude = res["result"]["geometry"]["location"]["lng"];
     Provider.of<AppData>(context).updateDropOffLocationAddress(address);
+    
+    Navigator.pop(context, "obtainDirection");
   }
 }
 
